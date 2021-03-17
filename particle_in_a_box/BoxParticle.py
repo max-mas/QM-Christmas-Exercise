@@ -62,6 +62,7 @@ for i in range(xres):
         continue
     omega_0.append( -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1] )  
 
+# initialise a
 a = []
 for i in range(xres):
     if i == 0:
@@ -73,9 +74,11 @@ omega = []
 for i in range(xres):
     omega.append(omega_0[i])
 
+# initialise plot
 fig = plt.figure() 
 frames = []
 
+# this is where the magic happens:
 for t in range(tres):
 
     # b
@@ -104,6 +107,7 @@ for t in range(tres):
             continue
         omega[i] = -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
 
+    # add every fifth step to animation
     if t%5 == 0:
         prob = []
         for i in range(xres):
@@ -117,21 +121,16 @@ for t in range(tres):
         #norm = norm + psi[i] * np.conjugate(psi[i]) * dx
     #print(norm)
 
+# make a nice .gif
 axs = plt.subplot()
 
 ani = animation.ArtistAnimation(fig, frames, interval=60, blit=True, repeat_delay=1000)
-axs.set_title("Teilchen im Kastenpotential")
+axs.set_title("Particle in a box")
 fig.suptitle("dx = 0.001, dt = 0.001, t in [0,2/3]")
-axs.set_xlabel("Ort x")
-axs.set_ylabel("Aufenthaltswahrscheinlichkeitsdichte")
+axs.set_xlabel("Position x")
+axs.set_ylabel("Probability density (may not be normalised)")
 ani.save('test.gif')
 plt.show()
         
-# plot probability
-#prob = []
-#for i in range(xres):
-    #prob.append( np.abs( psi[i] )**2 )
-#plt.plot(prob)
-#plt.show()
 
 

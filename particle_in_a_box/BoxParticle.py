@@ -1,6 +1,7 @@
 # imports
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 # constants
 k = 40
@@ -16,10 +17,10 @@ try:
     print("Specify time:")
     time = int( input() )
 except:
-    print("Invalid input. Used defaults: dx = 0.001, dt = 0.001, time = 2/3")
+    print("Invalid input. Used defaults: dx = 0.001, dt = 0.001, time = 2/Pi")
     dx = 0.001
-    dt = 0.001
-    time = 2/3
+    dt = 0.0001
+    time = 2/np.pi
 
 # calculate spatial and temporal resolution
 
@@ -41,8 +42,8 @@ for i in range(xres):
 prob = []
 for i in range(xres):
     prob.append( np.abs( psi_0[i] )**2 )
-#plt.plot(prob)
-#plt.show()
+plt.plot(prob)
+plt.show()
 
 # initialise psi
 psi = []
@@ -72,7 +73,11 @@ omega = []
 for i in range(xres):
     omega.append(omega_0[i])
 
+fig = plt.figure() 
+frames = []
+
 for t in range(tres):
+
     # b
     b = []
     for i in range(xres):
@@ -80,6 +85,7 @@ for t in range(tres):
             b.append( omega[i] )
             continue
         b.append( omega[i] + b[i-1]/a[i-1] )
+
     #advance psi
     for i in range(xres):
         k = xres - 1 - i
@@ -87,7 +93,6 @@ for t in range(tres):
             psi[i] = 0
             continue
         psi[k] = ( psi[k+1] - b[k] ) / a[k]
-
 
     # omega
     for i in range(xres):
@@ -98,12 +103,35 @@ for t in range(tres):
             omega[i] = (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
             continue
         omega[i] = -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
+
+    if t%5 == 0:
+        prob = []
+        for i in range(xres):
+            prob.append( np.abs( psi[i] )**2 )
+        frames.append(plt.plot(prob, 'C0'))
+    
+
+    # sanity check: should remain ~ constant with each iteration
+    #norm = 0
+    #for i in range(xres):
+        #norm = norm + psi[i] * np.conjugate(psi[i]) * dx
+    #print(norm)
+
+axs = plt.subplot()
+
+ani = animation.ArtistAnimation(fig, frames, interval=60, blit=True, repeat_delay=1000)
+axs.set_title("Teilchen im Kastenpotential")
+fig.suptitle("dx = 0.001, dt = 0.001, t in [0,2/3]")
+axs.set_xlabel("Ort x")
+axs.set_ylabel("Aufenthaltswahrscheinlichkeitsdichte")
+ani.save('test.gif')
+plt.show()
         
 # plot probability
-prob = []
-for i in range(xres):
-    prob.append( np.abs( psi[i] )**2 )
-plt.plot(prob)
-plt.show()
+#prob = []
+#for i in range(xres):
+    #prob.append( np.abs( psi[i] )**2 )
+#plt.plot(prob)
+#plt.show()
 
 

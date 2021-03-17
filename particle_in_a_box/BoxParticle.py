@@ -41,68 +41,75 @@ for i in range(xres):
 prob = []
 for i in range(xres):
     prob.append( np.abs( psi_0[i] )**2 )
-plt.plot(prob)
-plt.show()
+#plt.plot(prob)
+#plt.show()
 
-# declare psi
-psi = psi_0
-
-# omegas for t = 0
-omega_j0 = []
+# initialise psi
+psi = []
 for i in range(xres):
-    if i != 0 and i != xres -1:
-        omega_j0.append( -psi_0[i+1] + (2j*dx**2/dt + 2) * psi_0[i] - psi_0[i-1]  )
-    elif i == 0:
-        omega_j0.append( -psi_0[i+1] + (2j*dx**2/dt + 2) * psi_0[i] )
-    elif i == xres -1:
-        omega_j0.append( (2j*dx**2/dt + 2) * psi_0[i] - psi_0[i-1]  )
+    psi.append(psi_0[i])
 
-# a
-a_j = []
+# initialise omega0
+omega_0 = []
+
+for i in range(xres):
+    if i == 0 :
+        omega_0.append(  -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] ) 
+        continue
+    if i == xres - 1:
+        omega_0.append( (2j * dx**2/dt + 2) * psi[i] - psi[i-1] ) 
+        continue
+    omega_0.append( -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1] )  
+
+a = []
 for i in range(xres):
     if i == 0:
-        a_j.append( 2 - 2j*dx**2/dt )  
+        a.append( 2 - 2j*dx**2/dt )
         continue
-    a_j.append( 2 - 2j*dx**2/dt - 1/a_j[i-1] )
+    a.append( 2 - 2j*dx**2/dt - 1/a[i-1] )
 
-# b
-b_jn = []
-b_prev = b_jn
-omega_jn = omega_j0
-for i in range(tres):
-    b_prev = b_jn
-    b_jn = []
-    psi_prev = psi
+omega = []
+for i in range(xres):
+    omega.append(omega_0[i])
 
-    for k in range(xres):
-        if k == 0:
-            b_jn.append( omega_jn[0] )
-            continue
+for t in range(tres):
+    # b
+    b = []
+    for i in range(xres):
         if i == 0:
-            b_jn.append( omega_j0[k] )
+            b.append( omega[i] )
             continue
-        b_jn.append( omega_j0[k] + b_prev[k-1]/a_j[k-1] )
-
-    # evolve psi
-    for k in range(xres):
-        if k == 0 or k == xres -1:
-            psi[k] = 0
+        b.append( omega[i] + b[i-1]/a[i-1] )
+    #advance psi
+    for i in range(xres):
+        if i == xres -1:
+            psi[i] = 0
             continue
-        psi[k] = a_j[k] * psi_prev[k-1] + b_jn[k]
-    omega_prev = omega_jn
-
-    for k in range(xres):
-        if k != 0 and k != xres -1:
-            omega_j0.append( -psi[k+1] + (2j*dx**2/dt + 2) * psi[k] - psi[k-1]  )
-        elif k == 0:
-            omega_j0.append( -psi[k+1] + (2j*dx**2/dt + 2) * psi[k] )
-        elif k == xres -1:
-            omega_j0.append( (2j*dx**2/dt + 2) * psi[k] - psi[k-1]  )
+        psi[i+1] = a[i] * psi[i] + b[i]
+    # omega
+    for i in range(xres):
+        if i == 0:
+            omega[i] = -psi[i+1] + (2j * dx**2/dt + 2) * psi[i]
+            continue
+        if i == xres -1:
+            omega[i] = (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
+            continue
+        omega[i] = -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
+    if t == 0:
+        prob = []
+        for i in range(xres):
+            prob.append( np.abs( psi[i] )**2 )
+        plt.plot(prob)
+        plt.show()
+        print(a[0])
+        print(a[500])
+        print(b[0])
 
 # plot probability
 prob = []
 for i in range(xres):
     prob.append( np.abs( psi[i] )**2 )
-plt.plot(prob)
-plt.show()
+#plt.plot(prob)
+#plt.show()
+
 

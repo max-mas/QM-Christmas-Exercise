@@ -16,10 +16,10 @@ try:
     print("Specify time:")
     time = int( input() )
 except:
-    print("Invalid input. Used defaults: dx = 0.001, dt = 0.01, time = 3")
+    print("Invalid input. Used defaults: dx = 0.001, dt = 0.001, time = 2/3")
     dx = 0.001
-    dt = 0.01
-    time = 3
+    dt = 0.001
+    time = 2/3
 
 # calculate spatial and temporal resolution
 
@@ -82,10 +82,13 @@ for t in range(tres):
         b.append( omega[i] + b[i-1]/a[i-1] )
     #advance psi
     for i in range(xres):
-        if i == xres -1:
+        k = xres - 1 - i
+        if i == 0 or i == xres -1:
             psi[i] = 0
             continue
-        psi[i+1] = a[i] * psi[i] + b[i]
+        psi[k] = ( psi[k+1] - b[k] ) / a[k]
+
+
     # omega
     for i in range(xres):
         if i == 0:
@@ -95,21 +98,12 @@ for t in range(tres):
             omega[i] = (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
             continue
         omega[i] = -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
-    if t == 0:
-        prob = []
-        for i in range(xres):
-            prob.append( np.abs( psi[i] )**2 )
-        plt.plot(prob)
-        plt.show()
-        print(a[0])
-        print(a[500])
-        print(b[0])
-
+        
 # plot probability
 prob = []
 for i in range(xres):
     prob.append( np.abs( psi[i] )**2 )
-#plt.plot(prob)
-#plt.show()
+plt.plot(prob)
+plt.show()
 
 

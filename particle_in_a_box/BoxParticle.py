@@ -17,10 +17,10 @@ try:
     print("Specify time:")
     time = int( input() )
 except:
-    print("Invalid input. Used defaults: dx = 0.001, dt = 0.001, time = 2/Pi")
+    print("Invalid input. Used defaults: dx = 0.001, dt = 0.00001, time = 1")
     dx = 0.001
-    dt = 0.0001
-    time = 2/np.pi
+    dt = 0.00001
+    time = 1
 
 # calculate spatial and temporal resolution
 
@@ -107,12 +107,14 @@ for t in range(tres):
             continue
         omega[i] = -psi[i+1] + (2j * dx**2/dt + 2) * psi[i] - psi[i-1]
 
-    # add every fifth step to animation
+    # add every 5th step to animation
     if t%5 == 0:
         prob = []
         for i in range(xres):
             prob.append( np.abs( psi[i] )**2 )
         frames.append(plt.plot(prob, 'C0'))
+        # progress indicator:
+        print("image added, at " + str(t/tres) )
     
 
     # sanity check: should remain ~ constant with each iteration
@@ -126,7 +128,7 @@ axs = plt.subplot()
 
 ani = animation.ArtistAnimation(fig, frames, interval=60, blit=True, repeat_delay=1000)
 axs.set_title("Particle in a box")
-fig.suptitle("dx = 0.001, dt = 0.001, t in [0,2/3]")
+fig.suptitle("dx = 0.001, dt = 0.00001, t in [0,1]")
 axs.set_xlabel("Position x")
 axs.set_ylabel("Probability density (may not be normalised)")
 ani.save('test.gif')
